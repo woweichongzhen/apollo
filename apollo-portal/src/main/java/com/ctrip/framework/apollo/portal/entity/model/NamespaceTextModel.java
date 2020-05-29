@@ -1,79 +1,107 @@
 package com.ctrip.framework.apollo.portal.entity.model;
 
-
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
-import com.ctrip.framework.apollo.portal.environment.Env;
 import com.ctrip.framework.apollo.core.utils.StringUtils;
+import com.ctrip.framework.apollo.portal.environment.Env;
 
+/**
+ * 命名空间文本模型
+ */
 public class NamespaceTextModel implements Verifiable {
 
-  private String appId;
-  private String env;
-  private String clusterName;
-  private String namespaceName;
-  private long namespaceId;
-  private String format;
-  private String configText;
+    /**
+     * 应用编号
+     */
+    private String appId;
 
+    /**
+     * 环境
+     */
+    private String env;
 
-  @Override
-  public boolean isInvalid() {
-    return StringUtils.isContainEmpty(appId, env, clusterName, namespaceName) || namespaceId <= 0;
-  }
+    /**
+     * 集群名称
+     */
+    private String clusterName;
 
-  public String getAppId() {
-    return appId;
-  }
+    /**
+     * 命名空间名称
+     */
+    private String namespaceName;
 
-  public void setAppId(String appId) {
-    this.appId = appId;
-  }
+    /**
+     * 命名空间id
+     */
+    private long namespaceId;
 
-  public Env getEnv() {
-    return Env.fromString(env);
-  }
+    /**
+     * 文件格式
+     */
+    private String format;
 
-  public void setEnv(String env) {
-    this.env = env;
-  }
+    /**
+     * 配置文本
+     */
+    private String configText;
 
-  public String getClusterName() {
-    return clusterName;
-  }
+    @Override
+    public boolean isInvalid() {
+        return StringUtils.isContainEmpty(appId, env, clusterName, namespaceName) || namespaceId <= 0;
+    }
 
-  public void setClusterName(String clusterName) {
-    this.clusterName = clusterName;
-  }
+    public String getAppId() {
+        return appId;
+    }
 
-  public String getNamespaceName() {
-    return namespaceName;
-  }
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
-  public void setNamespaceName(String namespaceName) {
-    this.namespaceName = namespaceName;
-  }
+    public Env getEnv() {
+        return Env.fromString(env);
+    }
 
-  public long getNamespaceId() {
-    return namespaceId;
-  }
+    public void setEnv(String env) {
+        this.env = env;
+    }
 
-  public void setNamespaceId(long namespaceId) {
-    this.namespaceId = namespaceId;
-  }
+    public String getClusterName() {
+        return clusterName;
+    }
 
-  public String getConfigText() {
-    return configText;
-  }
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
-  public void setConfigText(String configText) {
-    this.configText = configText;
-  }
+    public String getNamespaceName() {
+        return namespaceName;
+    }
 
-  public ConfigFileFormat getFormat() {
-    return ConfigFileFormat.fromString(this.format);
-  }
+    public void setNamespaceName(String namespaceName) {
+        this.namespaceName = namespaceName;
+    }
 
-  public void setFormat(String format) {
-    this.format = format;
-  }
+    public long getNamespaceId() {
+        return namespaceId;
+    }
+
+    public void setNamespaceId(long namespaceId) {
+        this.namespaceId = namespaceId;
+    }
+
+    public String getConfigText() {
+        return configText;
+    }
+
+    public void setConfigText(String configText) {
+        this.configText = configText;
+    }
+
+    public ConfigFileFormat getFormat() {
+        return ConfigFileFormat.fromString(this.format);
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
 }

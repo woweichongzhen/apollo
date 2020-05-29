@@ -1,28 +1,40 @@
 package com.ctrip.framework.apollo.common.entity;
 
+/**
+ * 实体键值对
+ *
+ * @param <E> 实体
+ */
 public class EntityPair<E> {
 
-  private E firstEntity;
-  private E secondEntity;
+    /**
+     * 上一个实体
+     */
+    private E firstEntity;
 
-  public EntityPair(E firstEntity, E secondEntity){
-    this.firstEntity = firstEntity;
-    this.secondEntity = secondEntity;
-  }
+    /**
+     * 第二个实体
+     */
+    private E secondEntity;
 
-  public E getFirstEntity() {
-    return firstEntity;
-  }
+    public EntityPair(E firstEntity, E secondEntity) {
+        this.firstEntity = firstEntity;
+        this.secondEntity = secondEntity;
+    }
 
-  public void setFirstEntity(E firstEntity) {
-    this.firstEntity = firstEntity;
-  }
+    public E getFirstEntity() {
+        return firstEntity;
+    }
 
-  public E getSecondEntity() {
-    return secondEntity;
-  }
+    public void setFirstEntity(E firstEntity) {
+        this.firstEntity = firstEntity;
+    }
 
-  public void setSecondEntity(E secondEntity) {
-    this.secondEntity = secondEntity;
-  }
+    public E getSecondEntity() {
+        return secondEntity;
+    }
+
+    public void setSecondEntity(E secondEntity) {
+        this.secondEntity = secondEntity;
+    }
 }

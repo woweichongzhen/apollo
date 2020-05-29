@@ -1,5 +1,8 @@
 package com.ctrip.framework.apollo.openapi.dto;
 
+/**
+ * 开放的集群dto
+ */
 public class OpenClusterDTO extends BaseDTO {
 
   private String name;

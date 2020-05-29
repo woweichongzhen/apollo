@@ -11,28 +11,30 @@ import org.springframework.cloud.context.scope.refresh.RefreshScope;
 import org.springframework.stereotype.Component;
 
 /**
+ * 接收apollo配置推送，采用spring cloud 组件，refreshScope 作用域
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 @ConditionalOnProperty("redis.cache.enabled")
 @Component
 public class SpringBootApolloRefreshConfig {
-  private static final Logger logger = LoggerFactory.getLogger(SpringBootApolloRefreshConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringBootApolloRefreshConfig.class);
 
-  private final SampleRedisConfig sampleRedisConfig;
-  private final RefreshScope refreshScope;
+    private final SampleRedisConfig sampleRedisConfig;
+    private final RefreshScope refreshScope;
 
-  public SpringBootApolloRefreshConfig(
-      final SampleRedisConfig sampleRedisConfig,
-      final RefreshScope refreshScope) {
-    this.sampleRedisConfig = sampleRedisConfig;
-    this.refreshScope = refreshScope;
-  }
+    public SpringBootApolloRefreshConfig(
+            final SampleRedisConfig sampleRedisConfig,
+            final RefreshScope refreshScope) {
+        this.sampleRedisConfig = sampleRedisConfig;
+        this.refreshScope = refreshScope;
+    }
 
-  @ApolloConfigChangeListener(value = {ConfigConsts.NAMESPACE_APPLICATION, "TEST1.apollo", "application.yaml"},
-      interestedKeyPrefixes = {"redis.cache."})
-  public void onChange(ConfigChangeEvent changeEvent) {
-    logger.info("before refresh {}", sampleRedisConfig.toString());
-    refreshScope.refresh("sampleRedisConfig");
-    logger.info("after refresh {}", sampleRedisConfig.toString());
-  }
+    @ApolloConfigChangeListener(value = {ConfigConsts.NAMESPACE_APPLICATION, "TEST1.apollo", "application.yaml"},
+            interestedKeyPrefixes = {"redis.cache."})
+    public void onChange(ConfigChangeEvent changeEvent) {
+        logger.info("before refresh {}", sampleRedisConfig.toString());
+        refreshScope.refresh("sampleRedisConfig");
+        logger.info("after refresh {}", sampleRedisConfig.toString());
+    }
 }

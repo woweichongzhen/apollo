@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.portal.entity.po;
 
 import com.ctrip.framework.apollo.common.entity.BaseEntity;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -10,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
+ * 权限
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity
@@ -17,25 +18,32 @@ import javax.persistence.Table;
 @SQLDelete(sql = "Update Permission set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class Permission extends BaseEntity {
-  @Column(name = "PermissionType", nullable = false)
-  private String permissionType;
 
-  @Column(name = "TargetId", nullable = false)
-  private String targetId;
+    /**
+     * 权限类型
+     */
+    @Column(name = "PermissionType", nullable = false)
+    private String permissionType;
 
-  public String getPermissionType() {
-    return permissionType;
-  }
+    /**
+     * 目标id
+     */
+    @Column(name = "TargetId", nullable = false)
+    private String targetId;
 
-  public void setPermissionType(String permissionType) {
-    this.permissionType = permissionType;
-  }
+    public String getPermissionType() {
+        return permissionType;
+    }
 
-  public String getTargetId() {
-    return targetId;
-  }
+    public void setPermissionType(String permissionType) {
+        this.permissionType = permissionType;
+    }
 
-  public void setTargetId(String targetId) {
-    this.targetId = targetId;
-  }
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(String targetId) {
+        this.targetId = targetId;
+    }
 }

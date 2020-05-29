@@ -1,47 +1,61 @@
 package com.ctrip.framework.apollo.common.dto;
 
-
 import java.util.Date;
 
+/**
+ * dto对象父类
+ */
 public class BaseDTO {
 
-  protected String dataChangeCreatedBy;
+    /**
+     * 创建者
+     */
+    protected String dataChangeCreatedBy;
 
-  protected String dataChangeLastModifiedBy;
+    /**
+     * 上次修改者
+     */
+    protected String dataChangeLastModifiedBy;
 
-  protected Date dataChangeCreatedTime;
+    /**
+     * 创建时间
+     */
+    protected Date dataChangeCreatedTime;
 
-  protected Date dataChangeLastModifiedTime;
+    /**
+     * 上次修改时间
+     */
+    protected Date dataChangeLastModifiedTime;
 
-  public String getDataChangeCreatedBy() {
-    return dataChangeCreatedBy;
-  }
+    public String getDataChangeCreatedBy() {
+        return dataChangeCreatedBy;
+    }
 
-  public void setDataChangeCreatedBy(String dataChangeCreatedBy) {
-    this.dataChangeCreatedBy = dataChangeCreatedBy;
-  }
+    public void setDataChangeCreatedBy(String dataChangeCreatedBy) {
+        this.dataChangeCreatedBy = dataChangeCreatedBy;
+    }
 
-  public String getDataChangeLastModifiedBy() {
-    return dataChangeLastModifiedBy;
-  }
+    public String getDataChangeLastModifiedBy() {
+        return dataChangeLastModifiedBy;
+    }
 
-  public void setDataChangeLastModifiedBy(String dataChangeLastModifiedBy) {
-    this.dataChangeLastModifiedBy = dataChangeLastModifiedBy;
-  }
+    public void setDataChangeLastModifiedBy(String dataChangeLastModifiedBy) {
+        this.dataChangeLastModifiedBy = dataChangeLastModifiedBy;
+    }
 
-  public Date getDataChangeCreatedTime() {
-    return dataChangeCreatedTime;
-  }
+    public Date getDataChangeCreatedTime() {
+        return dataChangeCreatedTime;
+    }
 
-  public void setDataChangeCreatedTime(Date dataChangeCreatedTime) {
-    this.dataChangeCreatedTime = dataChangeCreatedTime;
-  }
+    public void setDataChangeCreatedTime(Date dataChangeCreatedTime) {
+        this.dataChangeCreatedTime = dataChangeCreatedTime;
+    }
 
-  public Date getDataChangeLastModifiedTime() {
-    return dataChangeLastModifiedTime;
-  }
+    public Date getDataChangeLastModifiedTime() {
+        return dataChangeLastModifiedTime;
+    }
 
-  public void setDataChangeLastModifiedTime(Date dataChangeLastModifiedTime) {
-    this.dataChangeLastModifiedTime = dataChangeLastModifiedTime;
-  }
+    public void setDataChangeLastModifiedTime(Date dataChangeLastModifiedTime) {
+        this.dataChangeLastModifiedTime = dataChangeLastModifiedTime;
+    }
 }

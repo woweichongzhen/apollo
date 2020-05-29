@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.biz.entity;
 
 import com.ctrip.framework.apollo.common.entity.BaseEntity;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -9,62 +8,94 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 审计
+ */
 @Entity
 @Table(name = "Audit")
 @SQLDelete(sql = "Update Audit set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class Audit extends BaseEntity {
 
-  public enum OP {
-    INSERT, UPDATE, DELETE
-  }
+    /**
+     * 类型
+     */
+    public enum OP {
+        /**
+         * 插入
+         */
+        INSERT,
 
-  @Column(name = "EntityName", nullable = false)
-  private String entityName;
+        /**
+         * 更新
+         */
+        UPDATE,
 
-  @Column(name = "EntityId")
-  private Long entityId;
+        /**
+         * 删除
+         */
+        DELETE
+    }
 
-  @Column(name = "OpName", nullable = false)
-  private String opName;
+    /**
+     * 实体类名
+     */
+    @Column(name = "EntityName", nullable = false)
+    private String entityName;
 
-  @Column(name = "Comment")
-  private String comment;
+    /**
+     * 实体id
+     */
+    @Column(name = "EntityId")
+    private Long entityId;
 
-  public String getComment() {
-    return comment;
-  }
+    /**
+     * 操作名称
+     */
+    @Column(name = "OpName", nullable = false)
+    private String opName;
 
-  public Long getEntityId() {
-    return entityId;
-  }
+    /**
+     * 注释
+     */
+    @Column(name = "Comment")
+    private String comment;
 
-  public String getEntityName() {
-    return entityName;
-  }
+    public String getComment() {
+        return comment;
+    }
 
-  public String getOpName() {
-    return opName;
-  }
+    public Long getEntityId() {
+        return entityId;
+    }
 
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
+    public String getEntityName() {
+        return entityName;
+    }
 
-  public void setEntityId(Long entityId) {
-    this.entityId = entityId;
-  }
+    public String getOpName() {
+        return opName;
+    }
 
-  public void setEntityName(String entityName) {
-    this.entityName = entityName;
-  }
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-  public void setOpName(String opName) {
-    this.opName = opName;
-  }
+    public void setEntityId(Long entityId) {
+        this.entityId = entityId;
+    }
 
-  public String toString() {
-    return toStringHelper().add("entityName", entityName).add("entityId", entityId)
-        .add("opName", opName).add("comment", comment).toString();
-  }
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
+    }
+
+    public void setOpName(String opName) {
+        this.opName = opName;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().add("entityName", entityName).add("entityId", entityId)
+                .add("opName", opName).add("comment", comment).toString();
+    }
 }

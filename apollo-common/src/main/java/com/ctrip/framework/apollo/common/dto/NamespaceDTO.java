@@ -1,50 +1,67 @@
 package com.ctrip.framework.apollo.common.dto;
 
 import com.ctrip.framework.apollo.common.utils.InputValidator;
+
 import javax.validation.constraints.Pattern;
 
-public class NamespaceDTO extends BaseDTO{
-  private long id;
+/**
+ * 命名空间dto
+ */
+public class NamespaceDTO extends BaseDTO {
 
-  private String appId;
+    /**
+     * 命名空间id
+     */
+    private long id;
 
-  private String clusterName;
+    /**
+     * 应用编号
+     */
+    private String appId;
 
-  @Pattern(
-      regexp = InputValidator.CLUSTER_NAMESPACE_VALIDATOR,
-      message = "Invalid Namespace format: " + InputValidator.INVALID_CLUSTER_NAMESPACE_MESSAGE
-  )
-  private String namespaceName;
+    /**
+     * 集群名称
+     */
+    private String clusterName;
 
-  public long getId() {
-    return id;
-  }
+    /**
+     * 命名空间名称
+     */
+    @Pattern(
+            regexp = InputValidator.CLUSTER_NAMESPACE_VALIDATOR,
+            message = "Invalid Namespace format: " + InputValidator.INVALID_CLUSTER_NAMESPACE_MESSAGE
+    )
+    private String namespaceName;
 
-  public void setId(long id) {
-    this.id = id;
-  }
+    public long getId() {
+        return id;
+    }
 
-  public String getAppId() {
-    return appId;
-  }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  public String getClusterName() {
-    return clusterName;
-  }
+    public String getAppId() {
+        return appId;
+    }
 
-  public String getNamespaceName() {
-    return namespaceName;
-  }
+    public String getClusterName() {
+        return clusterName;
+    }
 
-  public void setAppId(String appId) {
-    this.appId = appId;
-  }
+    public String getNamespaceName() {
+        return namespaceName;
+    }
 
-  public void setClusterName(String clusterName) {
-    this.clusterName = clusterName;
-  }
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
-  public void setNamespaceName(String namespaceName) {
-    this.namespaceName = namespaceName;
-  }
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public void setNamespaceName(String namespaceName) {
+        this.namespaceName = namespaceName;
+    }
 }

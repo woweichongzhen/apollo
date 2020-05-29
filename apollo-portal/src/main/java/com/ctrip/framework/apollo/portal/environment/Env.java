@@ -10,17 +10,21 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 环境对象
+ *
  * @author wxq
  */
 public class Env {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Env.class);
 
     // name of environment, cannot be null
     private final String name;
 
-    // use to cache Env
-    private static final Map<String, Env> STRING_ENV_MAP = new ConcurrentHashMap<>();;
+    /**
+     * 环境缓存
+     */
+    private static final Map<String, Env> STRING_ENV_MAP = new ConcurrentHashMap<>();
 
     // default environments
     public static final Env LOCAL = addEnvironment("LOCAL");
@@ -35,6 +39,7 @@ public class Env {
 
     /**
      * Cannot create by other
+     *
      * @param name
      */
     private Env(String name) {
@@ -42,23 +47,28 @@ public class Env {
     }
 
     /**
+     * 对环境名称进行一点修改，trim和大写
+     * <p>
      * add some change to environment name
      * trim and to upper
-     * @param environmentName
-     * @return
+     *
+     * @param environmentName 环境名称
+     * @return 修改后的
      */
     private static String getWellFormName(String environmentName) {
         return environmentName.trim().toUpperCase();
     }
 
     /**
+     * 转换环境
      * logic same as
+     *
+     * @param envName 环境名称
+     * @return 环境实体
      * @see com.ctrip.framework.apollo.core.enums.EnvUtils transformEnv
-     * @param envName
-     * @return
      */
     public static Env transformEnv(String envName) {
-        if(Env.exists(envName)) {
+        if (Env.exists(envName)) {
             return Env.valueOf(envName);
         }
         if (StringUtils.isBlank(envName)) {
@@ -85,11 +95,13 @@ public class Env {
                 return Env.UNKNOWN;
         }
     }
-    
+
     /**
+     * 环境名是否存在
      * a environment name exist or not
-     * @param name
-     * @return
+     *
+     * @param name 环境名
+     * @return true存在，false不存在
      */
     public static boolean exists(String name) {
         name = getWellFormName(name);
@@ -98,6 +110,7 @@ public class Env {
 
     /**
      * add an environment
+     *
      * @param name
      * @return
      */
@@ -107,7 +120,7 @@ public class Env {
         }
 
         name = getWellFormName(name);
-        if(STRING_ENV_MAP.containsKey(name)) {
+        if (STRING_ENV_MAP.containsKey(name)) {
             // has been existed
             logger.debug("{} already exists.", name);
         } else {
@@ -118,16 +131,18 @@ public class Env {
     }
 
     /**
+     * 接收值，转化为枚举
      * replace valueOf in enum
      * But what would happened if environment not exist?
      *
-     * @param name
+     * @param name 环境名
+     * @return 环境枚举
      * @throws IllegalArgumentException if this existed environment has no Env with the specified name
-     * @return
      */
     public static Env valueOf(String name) {
         name = getWellFormName(name);
-        if(exists(name)) {
+        // 存在返回对应的枚举，不存在异常
+        if (exists(name)) {
             return STRING_ENV_MAP.get(name);
         } else {
             throw new IllegalArgumentException(name + " not exist");
@@ -135,9 +150,11 @@ public class Env {
     }
 
     /**
+     * 转换环境
      * Please use {@code Env.valueOf} instead this method
-     * @param env
-     * @return
+     *
+     * @param env 环境字符串
+     * @return 环境实体类
      */
     @Deprecated
     public static Env fromString(String env) {
@@ -150,16 +167,17 @@ public class Env {
      * Not just name in Env,
      * the address of Env must be same,
      * or it will throw {@code RuntimeException}
+     *
      * @param o
-     * @throws RuntimeException When same name but different address
      * @return
+     * @throws RuntimeException When same name but different address
      */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Env env = (Env) o;
-        if(getName().equals(env.getName())) {
+        if (getName().equals(env.getName())) {
             throw new RuntimeException(getName() + " is same environment name, but their Env not same");
         } else {
             return false;
@@ -173,6 +191,7 @@ public class Env {
 
     /**
      * a Env convert to string, ie its name.
+     *
      * @return
      */
     @Override
@@ -182,6 +201,7 @@ public class Env {
 
     /**
      * Backward compatibility with enum's name method
+     *
      * @return
      */
     @Deprecated
@@ -195,13 +215,14 @@ public class Env {
 
     /**
      * conversion key from {@link String} to {@link Env}
+     *
      * @param metaServerAddresses key is environment, value is environment's meta server address
      * @return relationship between {@link Env} and meta server address
      */
     static Map<Env, String> transformToEnvMap(Map<String, String> metaServerAddresses) {
         // add to domain
         Map<Env, String> map = new ConcurrentHashMap<>();
-        for(Map.Entry<String, String> entry : metaServerAddresses.entrySet()) {
+        for (Map.Entry<String, String> entry : metaServerAddresses.entrySet()) {
             // add new environment
             Env env = Env.addEnvironment(entry.getKey());
             // get meta server address value

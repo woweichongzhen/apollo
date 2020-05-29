@@ -1,35 +1,50 @@
 package com.ctrip.framework.apollo.core.schedule;
 
 /**
+ * 指数的重试策略
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ExponentialSchedulePolicy implements SchedulePolicy {
-  private final long delayTimeLowerBound;
-  private final long delayTimeUpperBound;
-  private long lastDelayTime;
 
-  public ExponentialSchedulePolicy(long delayTimeLowerBound, long delayTimeUpperBound) {
-    this.delayTimeLowerBound = delayTimeLowerBound;
-    this.delayTimeUpperBound = delayTimeUpperBound;
-  }
+    /**
+     * 最低指数
+     */
+    private final long delayTimeLowerBound;
 
-  @Override
-  public long fail() {
-    long delayTime = lastDelayTime;
+    /**
+     * 最高重试次数
+     */
+    private final long delayTimeUpperBound;
 
-    if (delayTime == 0) {
-      delayTime = delayTimeLowerBound;
-    } else {
-      delayTime = Math.min(lastDelayTime << 1, delayTimeUpperBound);
+    /**
+     * 最后一次的延迟重试
+     */
+    private long lastDelayTime;
+
+    public ExponentialSchedulePolicy(long delayTimeLowerBound, long delayTimeUpperBound) {
+        this.delayTimeLowerBound = delayTimeLowerBound;
+        this.delayTimeUpperBound = delayTimeUpperBound;
     }
 
-    lastDelayTime = delayTime;
+    @Override
+    public long fail() {
+        long delayTime = lastDelayTime;
 
-    return delayTime;
-  }
+        // 失败基于上次重试执行指数增长
+        if (delayTime == 0) {
+            delayTime = delayTimeLowerBound;
+        } else {
+            delayTime = Math.min(lastDelayTime << 1, delayTimeUpperBound);
+        }
 
-  @Override
-  public void success() {
-    lastDelayTime = 0;
-  }
+        lastDelayTime = delayTime;
+
+        return delayTime;
+    }
+
+    @Override
+    public void success() {
+        lastDelayTime = 0;
+    }
 }

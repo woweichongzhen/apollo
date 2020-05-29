@@ -7,170 +7,246 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.stereotype.Component;
+
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
+/**
+ * 业务变量配置
+ */
 @Component
 public class BizConfig extends RefreshableConfig {
 
-  private static final int DEFAULT_ITEM_KEY_LENGTH = 128;
-  private static final int DEFAULT_ITEM_VALUE_LENGTH = 20000;
-  private static final int DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL = 60; //60s
-  private static final int DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL = 60; //60s
-  private static final int DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL = 1; //1s
-  private static final int DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL = 1; //1s
-  private static final int DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL = 60; //60s
-  private static final int DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL = 1; //1s
-  private static final int DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS = 1000; //1000ms
-  private static final int DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH = 100;
-  private static final int DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI = 100;//100ms
-  private static final int DEFAULT_LONG_POLLING_TIMEOUT = 60; //60s
+    /**
+     * 默认的项键长度限制
+     */
+    private static final int DEFAULT_ITEM_KEY_LENGTH = 128;
 
-  private Gson gson = new Gson();
-  private static final Type namespaceValueLengthOverrideTypeReference =
-      new TypeToken<Map<Long, Integer>>() {
-      }.getType();
+    /**
+     * 默认的项值长度限制
+     */
+    private static final int DEFAULT_ITEM_VALUE_LENGTH = 20000;
+    private static final int DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL = 60; //60s
+    private static final int DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL = 60; //60s
+    private static final int DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL = 1; //1s
+    private static final int DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL = 1; //1s
+    private static final int DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL = 60; //60s
+    private static final int DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL = 1; //1s
+    private static final int DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS = 1000; //1000ms
 
-  private final BizDBPropertySource propertySource;
+    /**
+     * 默认的消息通知（通知给客户端）的批量数量
+     */
+    private static final int DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH = 100;
+    private static final int DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI = 100;//100ms
+    private static final int DEFAULT_LONG_POLLING_TIMEOUT = 60; //60s
 
-  public BizConfig(final BizDBPropertySource propertySource) {
-    this.propertySource = propertySource;
-  }
+    private Gson gson = new Gson();
 
-  @Override
-  protected List<RefreshablePropertySource> getRefreshablePropertySources() {
-    return Collections.singletonList(propertySource);
-  }
+    /**
+     * 命名空间值长度重写类型
+     */
+    private static final Type NAMESPACE_VALUE_LENGTH_OVERRIDE_TYPE_REFERENCE =
+            new TypeToken<Map<Long, Integer>>() {
+            }.getType();
 
-  public List<String> eurekaServiceUrls() {
-    String configuration = getValue("eureka.service.url", "");
-    if (Strings.isNullOrEmpty(configuration)) {
-      return Collections.emptyList();
+    private final BizDBPropertySource propertySource;
+
+    public BizConfig(final BizDBPropertySource propertySource) {
+        this.propertySource = propertySource;
     }
 
-    return splitter.splitToList(configuration);
-  }
-
-  public int grayReleaseRuleScanInterval() {
-    int interval = getIntProperty("apollo.gray-release-rule-scan.interval", DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL);
-  }
-
-  public long longPollingTimeoutInMilli() {
-    int timeout = getIntProperty("long.polling.timeout", DEFAULT_LONG_POLLING_TIMEOUT);
-    // java client's long polling timeout is 90 seconds, so server side long polling timeout must be less than 90
-    return 1000 * checkInt(timeout, 1, 90, DEFAULT_LONG_POLLING_TIMEOUT);
-  }
-
-  public int itemKeyLengthLimit() {
-    int limit = getIntProperty("item.key.length.limit", DEFAULT_ITEM_KEY_LENGTH);
-    return checkInt(limit, 5, Integer.MAX_VALUE, DEFAULT_ITEM_KEY_LENGTH);
-  }
-
-  public int itemValueLengthLimit() {
-    int limit = getIntProperty("item.value.length.limit", DEFAULT_ITEM_VALUE_LENGTH);
-    return checkInt(limit, 5, Integer.MAX_VALUE, DEFAULT_ITEM_VALUE_LENGTH);
-  }
-
-  public Map<Long, Integer> namespaceValueLengthLimitOverride() {
-    String namespaceValueLengthOverrideString = getValue("namespace.value.length.limit.override");
-    Map<Long, Integer> namespaceValueLengthOverride = Maps.newHashMap();
-    if (!Strings.isNullOrEmpty(namespaceValueLengthOverrideString)) {
-      namespaceValueLengthOverride =
-          gson.fromJson(namespaceValueLengthOverrideString, namespaceValueLengthOverrideTypeReference);
+    @Override
+    protected List<RefreshablePropertySource> getRefreshablePropertySources() {
+        return Collections.singletonList(propertySource);
     }
 
-    return namespaceValueLengthOverride;
-  }
+    public List<String> eurekaServiceUrls() {
+        String configuration = getValue("eureka.service.url", "");
+        if (Strings.isNullOrEmpty(configuration)) {
+            return Collections.emptyList();
+        }
 
-  public boolean isNamespaceLockSwitchOff() {
-    return !getBooleanProperty("namespace.lock.switch", false);
-  }
-
-  /**
-   * ctrip config
-   **/
-  public String cloggingUrl() {
-    return getValue("clogging.server.url");
-  }
-
-  public String cloggingPort() {
-    return getValue("clogging.server.port");
-  }
-
-  public int appNamespaceCacheScanInterval() {
-    int interval = getIntProperty("apollo.app-namespace-cache-scan.interval", DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL);
-  }
-
-  public TimeUnit appNamespaceCacheScanIntervalTimeUnit() {
-    return TimeUnit.SECONDS;
-  }
-
-  public int appNamespaceCacheRebuildInterval() {
-    int interval = getIntProperty("apollo.app-namespace-cache-rebuild.interval", DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL);
-  }
-
-  public TimeUnit appNamespaceCacheRebuildIntervalTimeUnit() {
-    return TimeUnit.SECONDS;
-  }
-
-  public int accessKeyCacheScanInterval() {
-    int interval = getIntProperty("apollo.access-key-cache-scan.interval", DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL);
-  }
-
-  public TimeUnit accessKeyCacheScanIntervalTimeUnit() {
-    return TimeUnit.SECONDS;
-  }
-
-  public int accessKeyCacheRebuildInterval() {
-    int interval = getIntProperty("apollo.access-key-cache-rebuild.interval", DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL);
-  }
-
-  public TimeUnit accessKeyCacheRebuildIntervalTimeUnit() {
-    return TimeUnit.SECONDS;
-  }
-
-  public int releaseMessageCacheScanInterval() {
-    int interval = getIntProperty("apollo.release-message-cache-scan.interval", DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL);
-    return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL);
-  }
-
-  public TimeUnit releaseMessageCacheScanIntervalTimeUnit() {
-    return TimeUnit.SECONDS;
-  }
-
-  public int releaseMessageScanIntervalInMilli() {
-    int interval = getIntProperty("apollo.message-scan.interval", DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS);
-    return checkInt(interval, 100, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS);
-  }
-
-  public int releaseMessageNotificationBatch() {
-    int batch = getIntProperty("apollo.release-message.notification.batch", DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH);
-    return checkInt(batch, 1, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH);
-  }
-
-  public int releaseMessageNotificationBatchIntervalInMilli() {
-    int interval = getIntProperty("apollo.release-message.notification.batch.interval", DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI);
-    return checkInt(interval, 10, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI);
-  }
-
-  public boolean isConfigServiceCacheEnabled() {
-    return getBooleanProperty("config-service.cache.enabled", false);
-  }
-
-  int checkInt(int value, int min, int max, int defaultValue) {
-    if (value >= min && value <= max) {
-      return value;
+        return splitter.splitToList(configuration);
     }
-    return defaultValue;
-  }
+
+    /**
+     * 灰度发布规则的周期
+     */
+    public int grayReleaseRuleScanInterval() {
+        int interval = getIntProperty("apollo.gray-release-rule-scan.interval",
+                DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_GRAY_RELEASE_RULE_SCAN_INTERVAL);
+    }
+
+    public long longPollingTimeoutInMilli() {
+        int timeout = getIntProperty("long.polling.timeout", DEFAULT_LONG_POLLING_TIMEOUT);
+        // java client's long polling timeout is 90 seconds, so server side long polling timeout must be less than 90
+        return 1000 * checkInt(timeout, 1, 90, DEFAULT_LONG_POLLING_TIMEOUT);
+    }
+
+    /**
+     * 项键的长度限制，最小5，最大根据配置指定
+     *
+     * @return 处理后的值
+     */
+    public int itemKeyLengthLimit() {
+        int limit = getIntProperty("item.key.length.limit", DEFAULT_ITEM_KEY_LENGTH);
+        return checkInt(limit, 5, Integer.MAX_VALUE, DEFAULT_ITEM_KEY_LENGTH);
+    }
+
+    /**
+     * 项值的长度限制，最小5，最大根据配置指定
+     *
+     * @return 处理后的值
+     */
+    public int itemValueLengthLimit() {
+        int limit = getIntProperty("item.value.length.limit", DEFAULT_ITEM_VALUE_LENGTH);
+        return checkInt(limit, 5, Integer.MAX_VALUE, DEFAULT_ITEM_VALUE_LENGTH);
+    }
+
+    /**
+     * 命名空间值的长度限制重写
+     *
+     * @return 重写后的map
+     */
+    public Map<Long, Integer> namespaceValueLengthLimitOverride() {
+        String namespaceValueLengthOverrideString = getValue("namespace.value.length.limit.override");
+        Map<Long, Integer> namespaceValueLengthOverride = Maps.newHashMap();
+        if (!Strings.isNullOrEmpty(namespaceValueLengthOverrideString)) {
+            namespaceValueLengthOverride =
+                    gson.fromJson(namespaceValueLengthOverrideString, NAMESPACE_VALUE_LENGTH_OVERRIDE_TYPE_REFERENCE);
+        }
+
+        return namespaceValueLengthOverride;
+    }
+
+    /**
+     * 命名空间锁开关是否关闭
+     *
+     * @return 默认关闭，true关闭，false开启
+     */
+    public boolean isNamespaceLockSwitchOff() {
+        return !getBooleanProperty("namespace.lock.switch", false);
+    }
+
+    /**
+     * ctrip config
+     **/
+    public String cloggingUrl() {
+        return getValue("clogging.server.url");
+    }
+
+    public String cloggingPort() {
+        return getValue("clogging.server.port");
+    }
+
+    public int appNamespaceCacheScanInterval() {
+        int interval = getIntProperty("apollo.app-namespace-cache-scan.interval",
+                DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_APPNAMESPACE_CACHE_SCAN_INTERVAL);
+    }
+
+    public TimeUnit appNamespaceCacheScanIntervalTimeUnit() {
+        return TimeUnit.SECONDS;
+    }
+
+    public int appNamespaceCacheRebuildInterval() {
+        int interval = getIntProperty("apollo.app-namespace-cache-rebuild.interval",
+                DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_APPNAMESPACE_CACHE_REBUILD_INTERVAL);
+    }
+
+    public TimeUnit appNamespaceCacheRebuildIntervalTimeUnit() {
+        return TimeUnit.SECONDS;
+    }
+
+    public int accessKeyCacheScanInterval() {
+        int interval = getIntProperty("apollo.access-key-cache-scan.interval", DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_ACCESSKEY_CACHE_SCAN_INTERVAL);
+    }
+
+    public TimeUnit accessKeyCacheScanIntervalTimeUnit() {
+        return TimeUnit.SECONDS;
+    }
+
+    public int accessKeyCacheRebuildInterval() {
+        int interval = getIntProperty("apollo.access-key-cache-rebuild.interval",
+                DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_ACCESSKEY_CACHE_REBUILD_INTERVAL);
+    }
+
+    public TimeUnit accessKeyCacheRebuildIntervalTimeUnit() {
+        return TimeUnit.SECONDS;
+    }
+
+    public int releaseMessageCacheScanInterval() {
+        int interval = getIntProperty("apollo.release-message-cache-scan.interval",
+                DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL);
+        return checkInt(interval, 1, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_CACHE_SCAN_INTERVAL);
+    }
+
+    public TimeUnit releaseMessageCacheScanIntervalTimeUnit() {
+        return TimeUnit.SECONDS;
+    }
+
+    /**
+     * @return 发布消息扫描周期
+     */
+    public int releaseMessageScanIntervalInMilli() {
+        int interval = getIntProperty("apollo.message-scan.interval", DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS);
+        return checkInt(interval, 100, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_SCAN_INTERVAL_IN_MS);
+    }
+
+    /**
+     * 发布消息批量通知的个数
+     *
+     * @return 默认100
+     */
+    public int releaseMessageNotificationBatch() {
+        int batch = getIntProperty("apollo.release-message.notification.batch",
+                DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH);
+        return checkInt(batch, 1, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH);
+    }
+
+    /**
+     * 每批通知消息的等待时间
+     *
+     * @return 默认100ms
+     */
+    public int releaseMessageNotificationBatchIntervalInMilli() {
+        int interval = getIntProperty("apollo.release-message.notification.batch.interval",
+                DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI);
+        return checkInt(interval, 10, Integer.MAX_VALUE, DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI);
+    }
+
+    /**
+     * 配置启用，默认false
+     *
+     * @return true启动
+     */
+    public boolean isConfigServiceCacheEnabled() {
+        return getBooleanProperty("config-service.cache.enabled", false);
+    }
+
+    /**
+     * 校验int
+     *
+     * @param value        校验的值
+     * @param min          最小值
+     * @param max          最大值
+     * @param defaultValue 默认值
+     * @return 校验后的值
+     */
+    int checkInt(int value, int min, int max, int defaultValue) {
+        if (value >= min && value <= max) {
+            return value;
+        }
+        return defaultValue;
+    }
 
 }

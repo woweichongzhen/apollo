@@ -1,93 +1,121 @@
 package com.ctrip.framework.apollo.common.dto;
 
-public class ReleaseDTO extends BaseDTO{
-  private long id;
+/**
+ * 发布dto
+ */
+public class ReleaseDTO extends BaseDTO {
 
-  private String releaseKey;
+    /**
+     * 发布id
+     */
+    private long id;
 
-  private String name;
+    /**
+     * 发布key
+     */
+    private String releaseKey;
 
-  private String appId;
+    /**
+     * 发布名称
+     */
+    private String name;
 
-  private String clusterName;
+    /**
+     * 应用编号
+     */
+    private String appId;
 
-  private String namespaceName;
+    /**
+     * 集群名称
+     */
+    private String clusterName;
 
-  private String configurations;
+    /**
+     * 命名空间名称
+     */
+    private String namespaceName;
 
-  private String comment;
+    /**
+     * 所有配置map的json
+     */
+    private String configurations;
 
-  private boolean isAbandoned;
+    private String comment;
 
-  public long getId() {
-    return id;
-  }
+    /**
+     * 是否放弃
+     */
+    private boolean isAbandoned;
 
-  public void setId(long id) {
-    this.id = id;
-  }
+    public long getId() {
+        return id;
+    }
 
-  public String getReleaseKey() {
-    return releaseKey;
-  }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  public void setReleaseKey(String releaseKey) {
-    this.releaseKey = releaseKey;
-  }
+    public String getReleaseKey() {
+        return releaseKey;
+    }
 
-  public String getAppId() {
-    return appId;
-  }
+    public void setReleaseKey(String releaseKey) {
+        this.releaseKey = releaseKey;
+    }
 
-  public String getClusterName() {
-    return clusterName;
-  }
+    public String getAppId() {
+        return appId;
+    }
 
-  public String getComment() {
-    return comment;
-  }
+    public String getClusterName() {
+        return clusterName;
+    }
 
-  public String getConfigurations() {
-    return configurations;
-  }
+    public String getComment() {
+        return comment;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getConfigurations() {
+        return configurations;
+    }
 
-  public String getNamespaceName() {
-    return namespaceName;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setAppId(String appId) {
-    this.appId = appId;
-  }
+    public String getNamespaceName() {
+        return namespaceName;
+    }
 
-  public void setClusterName(String clusterName) {
-    this.clusterName = clusterName;
-  }
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
-  public void setConfigurations(String configurations) {
-    this.configurations = configurations;
-  }
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setConfigurations(String configurations) {
+        this.configurations = configurations;
+    }
 
-  public void setNamespaceName(String namespaceName) {
-    this.namespaceName = namespaceName;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public boolean isAbandoned() {
-    return isAbandoned;
-  }
+    public void setNamespaceName(String namespaceName) {
+        this.namespaceName = namespaceName;
+    }
 
-  public void setAbandoned(boolean abandoned) {
-    isAbandoned = abandoned;
-  }
+    public boolean isAbandoned() {
+        return isAbandoned;
+    }
+
+    public void setAbandoned(boolean abandoned) {
+        isAbandoned = abandoned;
+    }
 }

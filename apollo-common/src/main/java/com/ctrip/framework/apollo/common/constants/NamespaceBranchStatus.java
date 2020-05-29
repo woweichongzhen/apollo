@@ -1,11 +1,23 @@
 package com.ctrip.framework.apollo.common.constants;
 
+/**
+ * 命名空间分支状态
+ */
 public interface NamespaceBranchStatus {
 
-  int DELETED = 0;
+    /**
+     * 已删除
+     */
+    int DELETED = 0;
 
-  int ACTIVE = 1;
+    /**
+     * 正在灰度发布
+     */
+    int ACTIVE = 1;
 
-  int MERGED = 2;
+    /**
+     * 已合并
+     */
+    int MERGED = 2;
 
 }

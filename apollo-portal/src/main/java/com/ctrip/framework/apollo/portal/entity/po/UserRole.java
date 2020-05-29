@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.portal.entity.po;
 
 import com.ctrip.framework.apollo.common.entity.BaseEntity;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -10,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
+ * 用户角色
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity
@@ -17,25 +18,32 @@ import javax.persistence.Table;
 @SQLDelete(sql = "Update UserRole set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class UserRole extends BaseEntity {
-  @Column(name = "UserId", nullable = false)
-  private String userId;
 
-  @Column(name = "RoleId", nullable = false)
-  private long roleId;
+    /**
+     * 用户id
+     */
+    @Column(name = "UserId", nullable = false)
+    private String userId;
 
-  public String getUserId() {
-    return userId;
-  }
+    /**
+     * 角色id
+     */
+    @Column(name = "RoleId", nullable = false)
+    private long roleId;
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public String getUserId() {
+        return userId;
+    }
 
-  public long getRoleId() {
-    return roleId;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  public void setRoleId(long roleId) {
-    this.roleId = roleId;
-  }
+    public long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
+    }
 }
