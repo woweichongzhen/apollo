@@ -23,6 +23,13 @@ public interface RolePermissionRepository extends PagingAndSortingRepository<Rol
      */
     List<RolePermission> findByRoleIdIn(Collection<Long> roleId);
 
+    /**
+     * 假删除角色权限中间表
+     *
+     * @param permissionIds 要删除的权限id集合
+     * @param operator      操作者
+     * @return 修改的条数
+     */
     @Modifying
     @Query("UPDATE RolePermission SET IsDeleted=1, DataChange_LastModifiedBy = ?2 WHERE PermissionId in ?1")
     Integer batchDeleteByPermissionIds(List<Long> permissionIds, String operator);

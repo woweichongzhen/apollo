@@ -19,7 +19,15 @@ public interface ConfigConsts {
      * +号分割
      */
     String CLUSTER_NAMESPACE_SEPARATOR = "+";
+
+    /**
+     * apollo集群key
+     */
     String APOLLO_CLUSTER_KEY = "apollo.cluster";
+
+    /**
+     * apoolo元数据key
+     */
     String APOLLO_META_KEY = "apollo.meta";
 
     /**

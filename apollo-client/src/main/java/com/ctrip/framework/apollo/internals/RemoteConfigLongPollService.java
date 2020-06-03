@@ -49,8 +49,14 @@ public class RemoteConfigLongPollService {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteConfigLongPollService.class);
 
+    /**
+     * +号连接器
+     */
     private static final Joiner STRING_JOINER = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR);
 
+    /**
+     * url连接器
+     */
     private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
 
     private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
@@ -59,7 +65,6 @@ public class RemoteConfigLongPollService {
      * 初始化的通知id。-1
      */
     private static final long INIT_NOTIFICATION_ID = ConfigConsts.NOTIFICATION_ID_PLACEHOLDER;
-    //90 seconds, should be longer than server side's long polling timeout, which is now 60 seconds
 
     /**
      * 长轮询超时时间
@@ -113,16 +118,19 @@ public class RemoteConfigLongPollService {
      */
     private final Map<String, ApolloNotificationMessages> remoteNotificationMessages;
 
-    // -> notificationId
+    /**
+     * 转换http返回类型
+     * {@link ApolloConfigNotification}
+     */
     private final Type responseType;
 
     private final Gson gson;
 
     private final ConfigUtil configUtil;
 
-    private HttpUtil httpUtil;
+    private final HttpUtil httpUtil;
 
-    private ConfigServiceLocator serviceLocator;
+    private final ConfigServiceLocator serviceLocator;
 
     /**
      * Constructor.
@@ -172,7 +180,6 @@ public class RemoteConfigLongPollService {
         // CAS 更新为已启动
         if (!longPollStarted.compareAndSet(false, true)) {
             // 更新失败说明正在启动中
-            //already started
             return;
         }
         try {
@@ -194,6 +201,7 @@ public class RemoteConfigLongPollService {
                             //ignore
                         }
                     }
+
                     // 做长轮询刷新任务
                     doLongPollingRefresh(appId, cluster, dataCenter, secret);
                 }
@@ -208,8 +216,11 @@ public class RemoteConfigLongPollService {
         }
     }
 
+    /**
+     * 停止长轮询任务
+     */
     void stopLongPollingRefresh() {
-        this.longPollingStopped.compareAndSet(false, true);
+        longPollingStopped.compareAndSet(false, true);
     }
 
     /**
@@ -223,6 +234,7 @@ public class RemoteConfigLongPollService {
     private void doLongPollingRefresh(String appId, String cluster, String dataCenter, String secret) {
         final Random random = new Random();
         ServiceDTO lastServiceDto = null;
+
         // 如果长轮询未停止，且线程未中断，执行长轮询任务
         while (!longPollingStopped.get() && !Thread.currentThread().isInterrupted()) {
             // 限流5秒
@@ -268,18 +280,18 @@ public class RemoteConfigLongPollService {
                 // 如果返回码为200，则有新的通知，刷新本地缓存
                 if (response.getStatusCode() == 200
                         && response.getBody() != null) {
-                    // 更新通知id即消息id
-                    updateNotifications(response.getBody());
+                    // 更新最新的通知id即消息id
+                    this.updateNotifications(response.getBody());
+
                     // 更新远端通知的消息
-                    updateRemoteNotifications(response.getBody());
+                    this.updateRemoteNotifications(response.getBody());
                     transaction.addData("Result", response.getBody().toString());
 
                     // 通知远端仓库，执行强制拉取配置
-                    notify(lastServiceDto, response.getBody());
+                    this.notify(lastServiceDto, response.getBody());
                 }
 
-                //try to load balance
-                // 如果返回为304，说明没改动，重置dto，执行负载均衡
+                // 如果返回为304，说明没改动，重置配置服务dto，执行负载均衡
                 if (response.getStatusCode() == 304 && random.nextBoolean()) {
                     lastServiceDto = null;
                 }

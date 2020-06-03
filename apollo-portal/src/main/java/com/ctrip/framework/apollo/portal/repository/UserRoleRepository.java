@@ -37,6 +37,13 @@ public interface UserRoleRepository extends PagingAndSortingRepository<UserRole,
      */
     List<UserRole> findByUserIdInAndRoleId(Collection<String> userId, long roleId);
 
+    /**
+     * 假删除用户角色中间表
+     *
+     * @param roleIds  角色id集合
+     * @param operator 操作者
+     * @return 修改的条数
+     */
     @Modifying
     @Query("UPDATE UserRole SET IsDeleted=1, DataChange_LastModifiedBy = ?2 WHERE RoleId in ?1")
     Integer batchDeleteByRoleIds(List<Long> roleIds, String operator);

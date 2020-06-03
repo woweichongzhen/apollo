@@ -14,7 +14,7 @@ import java.util.Properties;
  */
 public class DefaultPropertiesFactory implements PropertiesFactory {
 
-    private ConfigUtil configUtil;
+    private final ConfigUtil configUtil;
 
     public DefaultPropertiesFactory() {
         configUtil = ApolloInjector.getInstance(ConfigUtil.class);

@@ -21,12 +21,17 @@ public class Permission extends BaseEntity {
 
     /**
      * 权限类型
+     * {@link com.ctrip.framework.apollo.portal.constant.PermissionType}
      */
     @Column(name = "PermissionType", nullable = false)
     private String permissionType;
 
     /**
      * 目标id
+     * <p>
+     * App 级别时，targetId 指向 "App 编号"。
+     * Namespace 级别时，targetId 指向 "App 编号 + Namespace 名字"。
+     * 为什么不是 Namespace 的编号？ Namespace 级别，是所有环境 + 所有集群都有权限，所以不能具体某个 Namespace 。
      */
     @Column(name = "TargetId", nullable = false)
     private String targetId;

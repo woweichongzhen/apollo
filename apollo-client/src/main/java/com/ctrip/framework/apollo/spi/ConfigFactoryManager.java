@@ -1,14 +1,17 @@
 package com.ctrip.framework.apollo.spi;
 
 /**
+ * 配置工厂管理
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 public interface ConfigFactoryManager {
-  /**
-   * Get the config factory for the namespace.
-   *
-   * @param namespace the namespace
-   * @return the config factory for this namespace
-   */
-  public ConfigFactory getFactory(String namespace);
+    /**
+     * 获取指定命名空间的配置工厂
+     * Get the config factory for the namespace.
+     *
+     * @param namespace the namespace
+     * @return the config factory for this namespace
+     */
+    ConfigFactory getFactory(String namespace);
 }

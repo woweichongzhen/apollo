@@ -1,56 +1,68 @@
 package com.ctrip.framework.apollo.internals;
 
-import java.util.Properties;
-
 import com.ctrip.framework.apollo.ConfigFileChangeListener;
 import com.ctrip.framework.apollo.PropertiesCompatibleConfigFile;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.model.ConfigFileChangeEvent;
 import com.google.common.base.Preconditions;
 
-public class PropertiesCompatibleFileConfigRepository extends AbstractConfigRepository implements
-    ConfigFileChangeListener {
-  private final PropertiesCompatibleConfigFile configFile;
-  private volatile Properties cachedProperties;
+import java.util.Properties;
 
-  public PropertiesCompatibleFileConfigRepository(PropertiesCompatibleConfigFile configFile) {
-    this.configFile = configFile;
-    this.configFile.addChangeListener(this);
-    this.trySync();
-  }
+/**
+ * 兼容属性文件的配置仓库
+ */
+public class PropertiesCompatibleFileConfigRepository extends AbstractConfigRepository implements ConfigFileChangeListener {
 
-  @Override
-  protected synchronized void sync() {
-    Properties current = configFile.asProperties();
+    /**
+     * 兼容属性的配置文件，比如yaml，yml
+     */
+    private final PropertiesCompatibleConfigFile configFile;
 
-    Preconditions.checkState(current != null, "PropertiesCompatibleConfigFile.asProperties should never return null");
+    /**
+     * 缓存的属性
+     */
+    private volatile Properties cachedProperties;
 
-    if (cachedProperties != current) {
-      cachedProperties = current;
-      this.fireRepositoryChange(configFile.getNamespace(), cachedProperties);
+    public PropertiesCompatibleFileConfigRepository(PropertiesCompatibleConfigFile configFile) {
+        this.configFile = configFile;
+        this.configFile.addChangeListener(this);
+        this.trySync();
     }
-  }
 
-  @Override
-  public Properties getConfig() {
-    if (cachedProperties == null) {
-      sync();
+    @Override
+    protected synchronized void sync() {
+        // 当前配置文件转换为属性
+        Properties current = configFile.asProperties();
+
+        Preconditions.checkState(current != null, "PropertiesCompatibleConfigFile.asProperties should never return " +
+                "null");
+
+        // 并进行缓存，触发监听器改变
+        if (cachedProperties != current) {
+            cachedProperties = current;
+            this.fireRepositoryChange(configFile.getNamespace(), cachedProperties);
+        }
     }
-    return cachedProperties;
-  }
 
-  @Override
-  public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
-    //config file is the upstream, so no need to set up extra upstream
-  }
+    @Override
+    public Properties getConfig() {
+        if (cachedProperties == null) {
+            sync();
+        }
+        return cachedProperties;
+    }
 
-  @Override
-  public ConfigSourceType getSourceType() {
-    return configFile.getSourceType();
-  }
+    @Override
+    public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
+    }
 
-  @Override
-  public void onChange(ConfigFileChangeEvent changeEvent) {
-    this.trySync();
-  }
+    @Override
+    public ConfigSourceType getSourceType() {
+        return configFile.getSourceType();
+    }
+
+    @Override
+    public void onChange(ConfigFileChangeEvent changeEvent) {
+        this.trySync();
+    }
 }

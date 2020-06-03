@@ -21,7 +21,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserInfo findByUserId(String userId) {
-        if (userId.equals("apollo")) {
+        if ("apollo".equals(userId)) {
             return assembleDefaultUser();
         }
         return null;
@@ -36,7 +36,7 @@ public class DefaultUserService implements UserService {
     }
 
     /**
-     * apollo默认用户
+     * 组装apollo默认用户
      *
      * @return 默认用户信息
      */

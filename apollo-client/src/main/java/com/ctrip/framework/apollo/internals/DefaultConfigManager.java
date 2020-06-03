@@ -1,7 +1,5 @@
 package com.ctrip.framework.apollo.internals;
 
-import java.util.Map;
-
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigFile;
 import com.ctrip.framework.apollo.build.ApolloInjector;
@@ -10,57 +8,79 @@ import com.ctrip.framework.apollo.spi.ConfigFactory;
 import com.ctrip.framework.apollo.spi.ConfigFactoryManager;
 import com.google.common.collect.Maps;
 
+import java.util.Map;
+
 /**
+ * 默认的配置文件管理器
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DefaultConfigManager implements ConfigManager {
-  private ConfigFactoryManager m_factoryManager;
 
-  private Map<String, Config> m_configs = Maps.newConcurrentMap();
-  private Map<String, ConfigFile> m_configFiles = Maps.newConcurrentMap();
+    /**
+     * 配置工厂管理
+     */
+    private final ConfigFactoryManager configFactoryManager;
 
-  public DefaultConfigManager() {
-    m_factoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
-  }
+    /**
+     * 配置缓存
+     * key：命名空间
+     * value：配置实例
+     */
+    private final Map<String, Config> configs = Maps.newConcurrentMap();
 
-  @Override
-  public Config getConfig(String namespace) {
-    Config config = m_configs.get(namespace);
+    /**
+     * 配置文件缓存
+     * key：命名空间
+     * value：配置文件实例
+     */
+    private final Map<String, ConfigFile> configFiles = Maps.newConcurrentMap();
 
-    if (config == null) {
-      synchronized (this) {
-        config = m_configs.get(namespace);
+    public DefaultConfigManager() {
+        configFactoryManager = ApolloInjector.getInstance(ConfigFactoryManager.class);
+    }
 
+    @Override
+    public Config getConfig(String namespace) {
+        Config config = configs.get(namespace);
+
+        // 缓存中没有，双重自检索，从配置工厂管理器中获取配置工厂，配置工厂根据命名空间创建配置对象
         if (config == null) {
-          ConfigFactory factory = m_factoryManager.getFactory(namespace);
+            synchronized (this) {
+                config = configs.get(namespace);
 
-          config = factory.create(namespace);
-          m_configs.put(namespace, config);
+                if (config == null) {
+                    ConfigFactory factory = configFactoryManager.getFactory(namespace);
+
+                    config = factory.create(namespace);
+                    configs.put(namespace, config);
+                }
+            }
         }
-      }
+
+        return config;
     }
 
-    return config;
-  }
+    @Override
+    public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
+        // 格式化命名空间文件名
+        String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
+        ConfigFile configFile = configFiles.get(namespaceFileName);
 
-  @Override
-  public ConfigFile getConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-    String namespaceFileName = String.format("%s.%s", namespace, configFileFormat.getValue());
-    ConfigFile configFile = m_configFiles.get(namespaceFileName);
-
-    if (configFile == null) {
-      synchronized (this) {
-        configFile = m_configFiles.get(namespaceFileName);
-
+        // 缓存中没有，双重自检索，从配置工厂管理器中获取配置工厂，配置工厂根据命名空间创建配置文件对象
         if (configFile == null) {
-          ConfigFactory factory = m_factoryManager.getFactory(namespaceFileName);
+            synchronized (this) {
+                configFile = configFiles.get(namespaceFileName);
 
-          configFile = factory.createConfigFile(namespaceFileName, configFileFormat);
-          m_configFiles.put(namespaceFileName, configFile);
+                if (configFile == null) {
+                    ConfigFactory factory = configFactoryManager.getFactory(namespaceFileName);
+
+                    configFile = factory.createConfigFile(namespaceFileName, configFileFormat);
+                    configFiles.put(namespaceFileName, configFile);
+                }
+            }
         }
-      }
-    }
 
-    return configFile;
-  }
+        return configFile;
+    }
 }

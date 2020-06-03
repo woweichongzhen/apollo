@@ -34,12 +34,32 @@ public interface PermissionRepository extends PagingAndSortingRepository<Permiss
     List<Permission> findByPermissionTypeInAndTargetId(Collection<String> permissionTypes,
                                                        String targetId);
 
+    /**
+     * 查找权限id
+     *
+     * @param appId like appId+%
+     * @return 权限id集合
+     */
     @Query("SELECT p.id from Permission p where p.targetId = ?1 or p.targetId like CONCAT(?1, '+%')")
     List<Long> findPermissionIdsByAppId(String appId);
 
+    /**
+     * 查找权限id
+     *
+     * @param appId         应用编号
+     * @param namespaceName 命名空间名称
+     * @return 权限id集合
+     */
     @Query("SELECT p.id from Permission p where p.targetId = CONCAT(?1, '+', ?2)")
     List<Long> findPermissionIdsByAppIdAndNamespace(String appId, String namespaceName);
 
+    /**
+     * 假删除权限id
+     *
+     * @param permissionIds 权限id集合
+     * @param operator      操作者
+     * @return 删除成功的条数
+     */
     @Modifying
     @Query("UPDATE Permission SET IsDeleted=1, DataChange_LastModifiedBy = ?2 WHERE Id in ?1")
     Integer batchDelete(List<Long> permissionIds, String operator);

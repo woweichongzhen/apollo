@@ -19,17 +19,24 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Type;
 import java.util.*;
 
+/**
+ * 前端配置
+ */
 @Component
 public class PortalConfig extends RefreshableConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PortalConfig.class);
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
+
+    /**
+     * 组织配置解析
+     */
     private static final Type ORGANIZATION = new TypeToken<List<Organization>>() {
     }.getType();
 
     /**
-     * meta servers config in "PortalDB.ServerConfig"
+     * meta 服务配置解析 in "PortalDB.ServerConfig"
      */
     private static final Type META_SERVERS = new TypeToken<Map<String, String>>() {
     }.getType();
@@ -46,7 +53,8 @@ public class PortalConfig extends RefreshableConfig {
     }
 
     /***
-     * Level: important
+     * 获取portal支持的环境
+     * @return portal支持的环境
      **/
     public List<Env> portalSupportedEnvs() {
         String[] configurations = getArrayProperty("apollo.portal.envs", new String[]{"FAT", "UAT", "PRO"});
@@ -60,7 +68,7 @@ public class PortalConfig extends RefreshableConfig {
     }
 
     /**
-     * @return the relationship between environment and its meta server. empty if meet exception
+     * @return 环境与其元服务器之间的关系。如果遇到异常，则为空
      */
     public Map<String, String> getMetaServers() {
         final String key = "apollo.portal.meta.servers";
@@ -69,11 +77,8 @@ public class PortalConfig extends RefreshableConfig {
             return Collections.emptyMap();
         }
 
-        // watch out that the format of content may be wrong
-        // that will cause exception
         Map<String, String> map = Collections.emptyMap();
         try {
-            // try to parse
             map = gson.fromJson(jsonContent, META_SERVERS);
         } catch (Exception e) {
             logger.error("wrong format with key: {}", key);
@@ -84,7 +89,7 @@ public class PortalConfig extends RefreshableConfig {
     /**
      * 获取超级用户
      *
-     * @return 超级用户id集合
+     * @return 超级用户集合
      */
     public List<String> superAdmins() {
         String superAdminConfig = getValue("superAdmin", "");
@@ -100,7 +105,6 @@ public class PortalConfig extends RefreshableConfig {
      * @return 环境集合
      */
     public Set<Env> emailSupportedEnvs() {
-        // 获取邮件支持的环境
         String[] configurations = getArrayProperty("email.supported.envs", null);
 
         Set<Env> result = Sets.newHashSet();

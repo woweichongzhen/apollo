@@ -31,12 +31,10 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
  * 支持OpenLdap，ApacheDS，ActiveDirectory使用{@link LdapTemplate}作为基础实现
  * <p>
  * Ldap user spi service
- * <p>
  * Support OpenLdap,ApacheDS,ActiveDirectory use {@link LdapTemplate} as underlying implementation
  *
  * @author xm.lin xm.lin@anxincloud.com
  * @author idefav
- * @Description ldap user service
  * @date 18-8-9 下午4:42
  */
 public class LdapUserService implements UserService {
@@ -118,7 +116,7 @@ public class LdapUserService implements UserService {
     /**
      * 用户信息Mapper
      */
-    private ContextMapper<UserInfo> ldapUserInfoMapper = (ctx) -> {
+    private final ContextMapper<UserInfo> ldapUserInfoMapper = (ctx) -> {
         DirContextAdapter contextAdapter = (DirContextAdapter) ctx;
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(contextAdapter.getStringAttribute(loginIdAttrName));
@@ -137,7 +135,8 @@ public class LdapUserService implements UserService {
         if (memberOf.length > 0 && !StringUtils.isEmpty(memberOf[0])) {
             ContainerCriteria memberOfFilters = query().where(MEMBER_OF_ATTR_NAME).is(memberOf[0]);
             Arrays.stream(memberOf).skip(1)
-                    .forEach(filter -> memberOfFilters.or(MEMBER_OF_ATTR_NAME).is(filter));
+                    .forEach(filter ->
+                            memberOfFilters.or(MEMBER_OF_ATTR_NAME).is(filter));
             criteria.and(memberOfFilters);
         }
         return criteria;

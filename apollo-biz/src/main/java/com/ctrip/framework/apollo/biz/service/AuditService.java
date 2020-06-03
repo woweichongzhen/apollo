@@ -19,10 +19,24 @@ public class AuditService {
         this.auditRepository = auditRepository;
     }
 
+    /**
+     * 根据创建者查找
+     *
+     * @param owner 拥有者
+     * @return 审计集合
+     */
     List<Audit> findByOwner(String owner) {
         return auditRepository.findByOwner(owner);
     }
 
+    /**
+     * 查找审计
+     *
+     * @param owner  创建者
+     * @param entity 实体
+     * @param op     操作类型
+     * @return 审计集合
+     */
     List<Audit> find(String owner, String entity, String op) {
         return auditRepository.findAudits(owner, entity, op);
     }
@@ -33,7 +47,7 @@ public class AuditService {
      * @param entityName 实体名称
      * @param entityId   实体id
      * @param op         操作类型
-     * @param owner      拥有者
+     * @param owner      创建者
      */
     @Transactional
     void audit(String entityName, Long entityId, Audit.OP op, String owner) {

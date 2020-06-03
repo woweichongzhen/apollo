@@ -235,15 +235,21 @@ public class BeanUtils {
     }
 
     /**
-     * The copy will ignore <em>BaseEntity</em> field
+     * 复制将忽略<em> BaseEntity </ em>字段
      *
-     * @param source
-     * @param target
+     * @param source 原对象
+     * @param target 目标对象
      */
     public static void copyEntityProperties(Object source, Object target) {
         org.springframework.beans.BeanUtils.copyProperties(source, target, COPY_IGNORED_PROPERTIES);
     }
 
-    private static final String[] COPY_IGNORED_PROPERTIES = {"id", "dataChangeCreatedBy", "dataChangeCreatedTime",
+    /**
+     * 拷贝要忽略的字段
+     */
+    private static final String[] COPY_IGNORED_PROPERTIES = {
+            "id",
+            "dataChangeCreatedBy",
+            "dataChangeCreatedTime",
             "dataChangeLastModifiedTime"};
 }

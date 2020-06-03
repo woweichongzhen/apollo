@@ -21,6 +21,11 @@ public class Role extends BaseEntity {
 
     /**
      * 角色名称
+     * <p>
+     * 目前有三种类型角色：
+     * App 管理员，格式为 "Master + AppId" ，例如："Master+100004458" 。
+     * Namespace 修改管理员，格式为 "ModifyNamespace + AppId + NamespaceName" ，例如："ModifyNamespace+100004458+application" 。
+     * Namespace 发布管理员，格式为 "ReleaseNamespace + AppId + NamespaceName" ，例如："ReleaseNamespace+100004458+application" 。
      */
     @Column(name = "RoleName", nullable = false)
     private String roleName;

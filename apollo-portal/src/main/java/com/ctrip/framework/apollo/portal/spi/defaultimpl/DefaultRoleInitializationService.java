@@ -32,23 +32,19 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
 
     @Autowired
     private RolePermissionService rolePermissionService;
+
     @Autowired
     private PortalConfig portalConfig;
+
     @Autowired
     private PermissionRepository permissionRepository;
 
-    /**
-     * 初始化应用相关角色
-     *
-     * @param app 应用
-     */
     @Transactional
     @Override
     public void initAppRoles(App app) {
         // 构建应用拥有者角色
         String appId = app.getAppId();
         String appMasterRoleName = RoleUtils.buildAppMasterRoleName(appId);
-
         // 按角色名称查找角色，请注意roleName应该是唯一的
         if (rolePermissionService.findRoleByRoleName(appMasterRoleName) != null) {
             return;
@@ -78,7 +74,6 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
                 RoleUtils.buildNamespaceRoleName(appId, ConfigConsts.NAMESPACE_APPLICATION, RoleType.RELEASE_NAMESPACE),
                 Sets.newHashSet(operator),
                 operator);
-
     }
 
     @Transactional
@@ -130,6 +125,7 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
     }
 
     @Transactional
+    @Override
     public void initCreateAppRole() {
         if (rolePermissionService.findRoleByRoleName(SystemRoleManagerService.CREATE_APPLICATION_ROLE_NAME) != null) {
             return;
@@ -148,13 +144,25 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
         rolePermissionService.createRoleWithPermissions(createAppRole, Sets.newHashSet(createAppPermission.getId()));
     }
 
+    @Transactional
+    @Override
+    public void initManageAppMasterRole(String appId, String operator) {
+        // 主要修复历史数据
+        String manageAppMasterRoleName = RoleUtils.buildAppRoleName(appId, PermissionType.MANAGE_APP_MASTER);
+        if (rolePermissionService.findRoleByRoleName(manageAppMasterRoleName) != null) {
+            return;
+        }
+        synchronized (DefaultRoleInitializationService.class) {
+            createManageAppMasterRole(appId, operator);
+        }
+    }
+
     /**
      * 创建管理应用的master角色
      *
      * @param appId    应用编号
      * @param operator 操作者
      */
-    @Transactional
     private void createManageAppMasterRole(String appId, String operator) {
         // 创建权限
         Permission permission = createPermission(appId, PermissionType.MANAGE_APP_MASTER, operator);
@@ -165,18 +173,6 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
         Set<Long> permissionIds = new HashSet<>();
         permissionIds.add(permission.getId());
         rolePermissionService.createRoleWithPermissions(role, permissionIds);
-    }
-
-    // fix historical data
-    @Transactional
-    public void initManageAppMasterRole(String appId, String operator) {
-        String manageAppMasterRoleName = RoleUtils.buildAppRoleName(appId, PermissionType.MANAGE_APP_MASTER);
-        if (rolePermissionService.findRoleByRoleName(manageAppMasterRoleName) != null) {
-            return;
-        }
-        synchronized (DefaultRoleInitializationService.class) {
-            createManageAppMasterRole(appId, operator);
-        }
     }
 
     /**

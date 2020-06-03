@@ -2,78 +2,94 @@ package com.ctrip.framework.apollo.portal.entity.po;
 
 import com.ctrip.framework.apollo.portal.entity.bo.UserInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
+ * 用户PO
+ *
  * @author lepdou 2017-04-08
  */
 @Entity
 @Table(name = "Users")
 public class UserPO {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "Id")
-  private long id;
-  @Column(name = "Username", nullable = false)
-  private String username;
-  @Column(name = "Password", nullable = false)
-  private String password;
-  @Column(name = "Email", nullable = false)
-  private String email;
-  @Column(name = "Enabled", nullable = false)
-  private int enabled;
+    /**
+     * id
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Id")
+    private long id;
 
-  public long getId() {
-    return id;
-  }
+    /**
+     * 用户名
+     */
+    @Column(name = "Username", nullable = false)
+    private String username;
 
-  public void setId(long id) {
-    this.id = id;
-  }
+    /**
+     * 密码
+     */
+    @Column(name = "Password", nullable = false)
+    private String password;
 
-  public String getUsername() {
-    return username;
-  }
+    /**
+     * 邮箱
+     */
+    @Column(name = "Email", nullable = false)
+    private String email;
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    /**
+     * 是否启用
+     */
+    @Column(name = "Enabled", nullable = false)
+    private int enabled;
 
-  public String getEmail() {
-    return email;
-  }
+    public long getId() {
+        return id;
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-  public int getEnabled() {
-    return enabled;
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  public void setEnabled(int enabled) {
-    this.enabled = enabled;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  public UserInfo toUserInfo() {
-    UserInfo userInfo = new UserInfo();
-    userInfo.setName(this.getUsername());
-    userInfo.setUserId(this.getUsername());
-    userInfo.setEmail(this.getEmail());
-    return userInfo;
-  }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
+    }
+
+    public UserInfo toUserInfo() {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(this.getUsername());
+        userInfo.setUserId(this.getUsername());
+        userInfo.setEmail(this.getEmail());
+        return userInfo;
+    }
 }

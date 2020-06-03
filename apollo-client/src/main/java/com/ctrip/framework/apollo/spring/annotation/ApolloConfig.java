@@ -1,14 +1,12 @@
 package com.ctrip.framework.apollo.spring.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import com.ctrip.framework.apollo.core.ConfigConsts;
 
+import java.lang.annotation.*;
+
 /**
+ * apollo配置注入到 Config 实例中，为了某个命名空间
+ * <p>
  * Use this annotation to inject Apollo Config Instance.
  *
  * <p>Usage example:</p>
@@ -24,8 +22,9 @@ import com.ctrip.framework.apollo.core.ConfigConsts;
 @Target(ElementType.FIELD)
 @Documented
 public @interface ApolloConfig {
-  /**
-   * Apollo namespace for the config, if not specified then default to application
-   */
-  String value() default ConfigConsts.NAMESPACE_APPLICATION;
+    /**
+     * 该配置的命名空间
+     * Apollo namespace for the config, if not specified then default to application
+     */
+    String value() default ConfigConsts.NAMESPACE_APPLICATION;
 }

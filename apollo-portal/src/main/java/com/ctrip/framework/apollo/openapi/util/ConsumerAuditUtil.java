@@ -20,67 +20,113 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * 第三方应用审计工具类
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 @Service
 public class ConsumerAuditUtil implements InitializingBean {
-  private static final int CONSUMER_AUDIT_MAX_SIZE = 10000;
-  private BlockingQueue<ConsumerAudit> audits = Queues.newLinkedBlockingQueue(CONSUMER_AUDIT_MAX_SIZE);
-  private final ExecutorService auditExecutorService;
-  private final AtomicBoolean auditStopped;
-  private int BATCH_SIZE = 100;
-  private long BATCH_TIMEOUT = 5;
-  private TimeUnit BATCH_TIMEUNIT = TimeUnit.SECONDS;
 
-  private final ConsumerService consumerService;
+    /**
+     * 最大第三方应用阻塞审计大笑
+     */
+    private static final int CONSUMER_AUDIT_MAX_SIZE = 10000;
 
-  public ConsumerAuditUtil(final ConsumerService consumerService) {
-    this.consumerService = consumerService;
-    auditExecutorService = Executors.newSingleThreadExecutor(
-        ApolloThreadFactory.create("ConsumerAuditUtil", true));
-    auditStopped = new AtomicBoolean(false);
-  }
+    /**
+     * 审计阻塞队列，最大10000条
+     */
+    private final BlockingQueue<ConsumerAudit> audits = Queues.newLinkedBlockingQueue(CONSUMER_AUDIT_MAX_SIZE);
 
-  public boolean audit(HttpServletRequest request, long consumerId) {
-    //ignore GET request
-    if ("GET".equalsIgnoreCase(request.getMethod())) {
-      return true;
+    /**
+     * 审计线程池
+     */
+    private final ExecutorService auditExecutorService;
+
+    /**
+     * 审计任务是否停止
+     */
+    private final AtomicBoolean auditStopped;
+
+    /**
+     * 批量插入大小
+     */
+    private final int BATCH_SIZE = 100;
+
+    /**
+     * 批量读取等待超时时间
+     */
+    private final long BATCH_TIMEOUT = 5;
+
+    /**
+     * 批量读取等待超时单位
+     */
+    private final TimeUnit BATCH_TIMEUNIT = TimeUnit.SECONDS;
+
+    private final ConsumerService consumerService;
+
+    public ConsumerAuditUtil(final ConsumerService consumerService) {
+        this.consumerService = consumerService;
+        auditExecutorService = Executors.newSingleThreadExecutor(
+                ApolloThreadFactory.create("ConsumerAuditUtil", true));
+        auditStopped = new AtomicBoolean(false);
     }
-    String uri = request.getRequestURI();
-    if (!Strings.isNullOrEmpty(request.getQueryString())) {
-      uri += "?" + request.getQueryString();
-    }
 
-    ConsumerAudit consumerAudit = new ConsumerAudit();
-    Date now = new Date();
-    consumerAudit.setConsumerId(consumerId);
-    consumerAudit.setUri(uri);
-    consumerAudit.setMethod(request.getMethod());
-    consumerAudit.setDataChangeCreatedTime(now);
-    consumerAudit.setDataChangeLastModifiedTime(now);
-
-    //throw away audits if exceeds the max size
-    return this.audits.offer(consumerAudit);
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    auditExecutorService.submit(() -> {
-      while (!auditStopped.get() && !Thread.currentThread().isInterrupted()) {
-        List<ConsumerAudit> toAudit = Lists.newArrayList();
-        try {
-          Queues.drain(audits, toAudit, BATCH_SIZE, BATCH_TIMEOUT, BATCH_TIMEUNIT);
-          if (!toAudit.isEmpty()) {
-            consumerService.createConsumerAudits(toAudit);
-          }
-        } catch (Throwable ex) {
-          Tracer.logError(ex);
+    /**
+     * 审计
+     *
+     * @param request    请求
+     * @param consumerId 应用id
+     * @return true添加成功
+     */
+    public boolean audit(HttpServletRequest request, long consumerId) {
+        // get请求无需审计
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            return true;
         }
-      }
-    });
-  }
 
-  public void stopAudit() {
-    auditStopped.set(true);
-  }
+        // 获取uri和查询参数
+        String uri = request.getRequestURI();
+        if (!Strings.isNullOrEmpty(request.getQueryString())) {
+            uri += "?" + request.getQueryString();
+        }
+
+        // 插入审计
+        ConsumerAudit consumerAudit = new ConsumerAudit();
+        Date now = new Date();
+        consumerAudit.setConsumerId(consumerId);
+        consumerAudit.setUri(uri);
+        consumerAudit.setMethod(request.getMethod());
+        consumerAudit.setDataChangeCreatedTime(now);
+        consumerAudit.setDataChangeLastModifiedTime(now);
+
+        // 如果超过最大大小，则放弃审核
+        return audits.offer(consumerAudit);
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        auditExecutorService.submit(() -> {
+            while (!auditStopped.get() && !Thread.currentThread().isInterrupted()) {
+                List<ConsumerAudit> toAudit = Lists.newArrayList();
+                try {
+                    // 从阻塞队列拿取任务，直到达到上限100条，或超时5S
+                    Queues.drain(audits, toAudit, BATCH_SIZE, BATCH_TIMEOUT, BATCH_TIMEUNIT);
+
+                    // 批量插入
+                    if (!toAudit.isEmpty()) {
+                        consumerService.createConsumerAudits(toAudit);
+                    }
+                } catch (Throwable ex) {
+                    Tracer.logError(ex);
+                }
+            }
+        });
+    }
+
+    /**
+     * 停止审计定时任务
+     */
+    public void stopAudit() {
+        auditStopped.set(true);
+    }
 }

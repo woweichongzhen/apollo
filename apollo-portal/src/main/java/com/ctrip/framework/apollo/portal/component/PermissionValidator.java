@@ -52,7 +52,7 @@ public class PermissionValidator {
     }
 
     /**
-     * 是否有修改命名空间的权限
+     * 是否有环境修改命名空间的权限
      *
      * @param appId         应用编号
      * @param namespaceName 命名空间名称
@@ -98,21 +98,48 @@ public class PermissionValidator {
                         RoleUtils.buildNamespaceTargetId(appId, namespaceName, env));
     }
 
+    /**
+     * 是否拥有删除命名空间的权限（分配角色或超级用户）
+     *
+     * @param appId 应用编号
+     * @return true有，false没有
+     */
     public boolean hasDeleteNamespacePermission(String appId) {
         return hasAssignRolePermission(appId) || isSuperAdmin();
     }
 
+    /**
+     * 是否拥有操作命名空间权限的权限（修改和发布）
+     *
+     * @param appId         应用编号
+     * @param namespaceName 命名空间名称
+     * @return true有，false没有
+     */
     public boolean hasOperateNamespacePermission(String appId, String namespaceName) {
-        return hasModifyNamespacePermission(appId, namespaceName) || hasReleaseNamespacePermission(appId,
-                namespaceName);
+        return hasModifyNamespacePermission(appId, namespaceName)
+                || hasReleaseNamespacePermission(appId, namespaceName);
     }
 
+    /**
+     * 是否拥有操作命名空间权限的权限（修改和发布）
+     *
+     * @param appId         应用编号
+     * @param namespaceName 命名空间名称
+     * @param env           环境
+     * @return true有，false没有
+     */
     public boolean hasOperateNamespacePermission(String appId, String namespaceName, String env) {
         return hasOperateNamespacePermission(appId, namespaceName) ||
                 hasModifyNamespacePermission(appId, namespaceName, env) ||
                 hasReleaseNamespacePermission(appId, namespaceName, env);
     }
 
+    /**
+     * 分配角色的权限
+     *
+     * @param appId 应用编号
+     * @return true有，false没有
+     */
     public boolean hasAssignRolePermission(String appId) {
         return rolePermissionService.userHasPermission(userInfoHolder.getUser().getUserId(),
                 PermissionType.ASSIGN_ROLE,
@@ -120,7 +147,7 @@ public class PermissionValidator {
     }
 
     /**
-     * 判断应用是否有创建命名空间的权限
+     * 是否有创建命名空间的权限
      *
      * @param appId 应用编号
      * @return ture有，false没有
@@ -141,7 +168,7 @@ public class PermissionValidator {
     public boolean hasCreateAppNamespacePermission(String appId, AppNamespace appNamespace) {
         // 是否公开的命名空间
         boolean isPublicAppNamespace = appNamespace.isPublic();
-        // 应用admin允许创建私有命名空间 或 创建公开类型的命名空间
+        // 应用管理员允许创建私有命名空间 或者 命名空间为公开类型
         // 再判断是否应用有这个权限
         if (portalConfig.canAppAdminCreatePrivateNamespace() || isPublicAppNamespace) {
             return hasCreateNamespacePermission(appId);
@@ -151,12 +178,24 @@ public class PermissionValidator {
         return isSuperAdmin();
     }
 
+    /**
+     * 是否拥有创建集群的权限
+     *
+     * @param appId 应用编号
+     * @return true有，false没有
+     */
     public boolean hasCreateClusterPermission(String appId) {
         return rolePermissionService.userHasPermission(userInfoHolder.getUser().getUserId(),
                 PermissionType.CREATE_CLUSTER,
                 appId);
     }
 
+    /**
+     * 是否为应用管理员（分配角色的权限或超级用户）
+     *
+     * @param appId 应用编号
+     * @return true有，false没有
+     */
     public boolean isAppAdmin(String appId) {
         return isSuperAdmin() || hasAssignRolePermission(appId);
     }
@@ -186,19 +225,37 @@ public class PermissionValidator {
         return !isAppAdmin(appId) && !hasOperateNamespacePermission(appId, namespaceName, env);
     }
 
+    /**
+     * 是否拥有创建应用的权限
+     *
+     * @return true有，false没有
+     */
     public boolean hasCreateApplicationPermission() {
         return hasCreateApplicationPermission(userInfoHolder.getUser().getUserId());
     }
 
+    /**
+     * 是否拥有创建应用的权限
+     *
+     * @param userId 用户id
+     * @return true有，false没有
+     */
     public boolean hasCreateApplicationPermission(String userId) {
         return systemRoleManagerService.hasCreateApplicationPermission(userId);
     }
 
+    /**
+     * 是否拥有管理应用master权限
+     *
+     * @param appId 应用编号
+     * @return true有，false没有
+     */
     public boolean hasManageAppMasterPermission(String appId) {
-        // the manage app master permission might not be initialized, so we need to check isSuperAdmin first
+        // manage app master权限可能未初始化，因此我们需要首先检查isSuperAdmin
         return isSuperAdmin() ||
                 (hasAssignRolePermission(appId) &&
-                        systemRoleManagerService.hasManageAppMasterPermission(userInfoHolder.getUser().getUserId(),
+                        systemRoleManagerService.hasManageAppMasterPermission(
+                                userInfoHolder.getUser().getUserId(),
                                 appId)
                 );
     }

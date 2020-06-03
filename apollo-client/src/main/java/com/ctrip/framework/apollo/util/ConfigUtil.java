@@ -42,16 +42,24 @@ public class ConfigUtil {
     private long onErrorRetryInterval = 1;//1 second
 
     /**
-     * 失败重试等待时间单位
+     * 失败重试等待时间单位，单位秒
      */
-    private TimeUnit onErrorRetryIntervalTimeUnit = TimeUnit.SECONDS;//1 second
+    private TimeUnit onErrorRetryIntervalTimeUnit = TimeUnit.SECONDS;
     //for typed config cache of parser result, e.g. integer, double, long, etc.
     private long maxConfigCacheSize = 500;//500 cache key
     private long configCacheExpireTime = 1;//1 minute
     private TimeUnit configCacheExpireTimeUnit = TimeUnit.MINUTES;//1 minute
     private long longPollingInitialDelayInMills = 2000;//2 seconds
+
+    /**
+     * 自动更新注入到spring的属性，默认更新
+     */
     private boolean autoUpdateInjectedSpringProperties = true;
     private final RateLimiter warnLogRateLimiter;
+
+    /**
+     * 是否开启属性排序，默认未开启
+     */
     private boolean propertiesOrdered = false;
 
     public ConfigUtil() {
@@ -68,18 +76,17 @@ public class ConfigUtil {
     }
 
     /**
-     * Get the app id for the current application.
+     * 获取当前应用的应用编号
      *
-     * @return the app id or ConfigConsts.NO_APPID_PLACEHOLDER if app id is not available
+     * @return 如果appid无价值，使用 {@link ConfigConsts.NO_APPID_PLACEHOLDER}
      */
     public String getAppId() {
         String appId = Foundation.app().getAppId();
         if (Strings.isNullOrEmpty(appId)) {
             appId = ConfigConsts.NO_APPID_PLACEHOLDER;
             if (warnLogRateLimiter.tryAcquire()) {
-                logger.warn(
-                        "app.id is not set, please make sure it is set in classpath:/META-INF/app.properties, now " +
-                                "apollo will only load public namespace configurations!");
+                logger.warn("app.id is not set, please make sure it is set in classpath:/META-INF/app.properties, now" +
+                        " apollo will only load public namespace configurations!");
             }
         }
         return appId;
@@ -119,15 +126,16 @@ public class ConfigUtil {
     }
 
     /**
-     * Get the cluster name for the current application.
+     * 获取当前应用的集群名称
      *
-     * @return the cluster name, or "default" if not specified
+     * @return 集群名称，如果未定义返回 default
      */
     public String getCluster() {
         return cluster;
     }
 
     /**
+     * 获取当前的环境
      * Get the current environment.
      *
      * @return the env, UNKNOWN if env is not set or invalid
@@ -140,6 +148,11 @@ public class ConfigUtil {
         return Foundation.net().getHostAddress();
     }
 
+    /**
+     * 获取元数据服务域名
+     *
+     * @return 元数据服务域名
+     */
     public String getMetaServerDomainName() {
         return MetaDomainConsts.getDomain(getApolloEnv());
     }
@@ -229,36 +242,53 @@ public class ConfigUtil {
         return onErrorRetryIntervalTimeUnit;
     }
 
+    /**
+     * 获取默认本地缓存目录
+     *
+     * @return 默认本地缓存目录，下面有应用appId一级
+     */
     public String getDefaultLocalCacheDir() {
+        // 先从自定义中获取，如果不为空，就使用自定义的
         String cacheRoot = getCustomizedCacheRoot();
 
         if (!Strings.isNullOrEmpty(cacheRoot)) {
             return cacheRoot + File.separator + getAppId();
         }
 
+        // 使用默认的，根据windows和linux构造目录路径
         cacheRoot = isOSWindows() ? "C:\\opt\\data\\%s" : "/opt/data/%s";
         return String.format(cacheRoot, getAppId());
     }
 
+    /**
+     * 获取自定义的根目录
+     *
+     * @return 自定义的根目录
+     */
     private String getCustomizedCacheRoot() {
-        // 1. Get from System Property
+        // 从JVM环境变量获取
         String cacheRoot = System.getProperty("apollo.cacheDir");
         if (Strings.isNullOrEmpty(cacheRoot)) {
-            // 2. Get from OS environment variable
+            // 从OS环境变量获取
             cacheRoot = System.getenv("APOLLO_CACHEDIR");
         }
         if (Strings.isNullOrEmpty(cacheRoot)) {
-            // 3. Get from server.properties
+            // 从 server.properties 配置文件获取
             cacheRoot = Foundation.server().getProperty("apollo.cacheDir", null);
         }
         if (Strings.isNullOrEmpty(cacheRoot)) {
-            // 4. Get from app.properties
+            // 从app.properties 配置文件获取
             cacheRoot = Foundation.app().getProperty("apollo.cacheDir", null);
         }
 
         return cacheRoot;
     }
 
+    /**
+     * 判断是否为本地模式，即环境是否为 LOCAL 环境
+     *
+     * @return true是，false不是
+     */
     public boolean isInLocalMode() {
         try {
             return Env.LOCAL == getApolloEnv();
@@ -268,6 +298,11 @@ public class ConfigUtil {
         return false;
     }
 
+    /**
+     * 判断操作系统是否为windows
+     *
+     * @return true为 windows ，false为linux
+     */
     public boolean isOSWindows() {
         String osName = System.getProperty("os.name");
         if (Strings.isNullOrEmpty(osName)) {
@@ -316,11 +351,14 @@ public class ConfigUtil {
         return longPollingInitialDelayInMills;
     }
 
+    /**
+     * 初始化是否自动更新spring注入的属性
+     */
     private void initAutoUpdateInjectedSpringProperties() {
-        // 1. Get from System Property
+        // 先判断系统属性中是否开启
         String enableAutoUpdate = System.getProperty("apollo.autoUpdateInjectedSpringProperties");
         if (Strings.isNullOrEmpty(enableAutoUpdate)) {
-            // 2. Get from app.properties
+            // 再判断 app.properties 中是否开启
             enableAutoUpdate = Foundation.app()
                     .getProperty("apollo.autoUpdateInjectedSpringProperties", null);
         }

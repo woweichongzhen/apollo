@@ -3,49 +3,56 @@ package com.ctrip.framework.apollo.util.http;
 import java.util.Map;
 
 /**
+ * http请求
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 public class HttpRequest {
-  private String m_url;
-  private Map<String, String> headers;
-  private int m_connectTimeout;
-  private int m_readTimeout;
 
-  /**
-   * Create the request for the url.
-   * @param url the url
-   */
-  public HttpRequest(String url) {
-    this.m_url = url;
-    m_connectTimeout = -1;
-    m_readTimeout = -1;
-  }
+    private final String url;
 
-  public String getUrl() {
-    return m_url;
-  }
+    private Map<String, String> headers;
 
-  public Map<String, String> getHeaders() {
-    return headers;
-  }
+    private int connectTimeout;
 
-  public void setHeaders(Map<String, String> headers) {
-    this.headers = headers;
-  }
+    private int readTimeout;
 
-  public int getConnectTimeout() {
-    return m_connectTimeout;
-  }
+    /**
+     * 创建请求url
+     *
+     * @param url url
+     */
+    public HttpRequest(String url) {
+        this.url = url;
+        connectTimeout = -1;
+        readTimeout = -1;
+    }
 
-  public void setConnectTimeout(int connectTimeout) {
-    this.m_connectTimeout = connectTimeout;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public int getReadTimeout() {
-    return m_readTimeout;
-  }
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
 
-  public void setReadTimeout(int readTimeout) {
-    this.m_readTimeout = readTimeout;
-  }
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
 }

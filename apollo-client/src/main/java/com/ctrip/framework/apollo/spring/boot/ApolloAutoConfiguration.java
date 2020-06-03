@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * apollo自动配置，如果配置了 apollo.bootstrap.enabled = true ，并且未加载属性源处理器bean
+ * 则会调用此配置类创建 配置 xml 属性源处理器
+ */
 @Configuration
 @ConditionalOnProperty(PropertySourcesConstants.APOLLO_BOOTSTRAP_ENABLED)
 @ConditionalOnMissingBean(PropertySourcesProcessor.class)

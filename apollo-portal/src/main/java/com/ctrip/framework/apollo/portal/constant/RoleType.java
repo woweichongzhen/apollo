@@ -20,8 +20,16 @@ public class RoleType {
      */
     public static final String RELEASE_NAMESPACE = "ReleaseNamespace";
 
+    /**
+     * 校验角色类型是否正确
+     *
+     * @param roleType 角色类型
+     * @return true正确，false不正确
+     */
     public static boolean isValidRoleType(String roleType) {
-        return MASTER.equals(roleType) || MODIFY_NAMESPACE.equals(roleType) || RELEASE_NAMESPACE.equals(roleType);
+        return MASTER.equals(roleType)
+                || MODIFY_NAMESPACE.equals(roleType)
+                || RELEASE_NAMESPACE.equals(roleType);
     }
 
 }

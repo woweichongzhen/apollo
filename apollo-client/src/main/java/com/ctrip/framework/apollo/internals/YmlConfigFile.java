@@ -3,15 +3,17 @@ package com.ctrip.framework.apollo.internals;
 import com.ctrip.framework.apollo.core.enums.ConfigFileFormat;
 
 /**
+ * yml配置文件
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 public class YmlConfigFile extends YamlConfigFile {
-  public YmlConfigFile(String namespace, ConfigRepository configRepository) {
-    super(namespace, configRepository);
-  }
+    public YmlConfigFile(String namespace, ConfigRepository configRepository) {
+        super(namespace, configRepository);
+    }
 
-  @Override
-  public ConfigFileFormat getConfigFileFormat() {
-    return ConfigFileFormat.YML;
-  }
+    @Override
+    public ConfigFileFormat getConfigFileFormat() {
+        return ConfigFileFormat.YML;
+    }
 }

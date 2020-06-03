@@ -2,11 +2,12 @@ package com.ctrip.framework.apollo.portal.constant;
 
 /**
  * 权限类型
+ * 包含应用权限，集群权限，命名空间权限，用户权限
  */
 public interface PermissionType {
 
     /**
-     * system level permission
+     * 创建应用权限
      */
     String CREATE_APPLICATION = "CreateApplication";
 
@@ -16,24 +17,18 @@ public interface PermissionType {
     String MANAGE_APP_MASTER = "ManageAppMaster";
 
     /**
-     * 创建命名空间的权限
-     */
-    String CREATE_NAMESPACE = "CreateNamespace";
-
-    /**
      * 创建集群的权限
      */
     String CREATE_CLUSTER = "CreateCluster";
 
     /**
-     * 分配用户权限的权限
+     * 创建命名空间的权限
      */
-    String ASSIGN_ROLE = "AssignRole";
+    String CREATE_NAMESPACE = "CreateNamespace";
 
     /**
-     * namespace level permission
+     * 修改命名空间权限
      */
-
     String MODIFY_NAMESPACE = "ModifyNamespace";
 
     /**
@@ -41,5 +36,9 @@ public interface PermissionType {
      */
     String RELEASE_NAMESPACE = "ReleaseNamespace";
 
+    /**
+     * 分配用户权限
+     */
+    String ASSIGN_ROLE = "AssignRole";
 
 }

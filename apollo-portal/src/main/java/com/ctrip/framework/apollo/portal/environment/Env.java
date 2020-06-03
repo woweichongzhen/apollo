@@ -109,22 +109,24 @@ public class Env {
     }
 
     /**
-     * add an environment
+     * 添加环境缓存
      *
-     * @param name
-     * @return
+     * @param name 环境名称
+     * @return 环境对象
      */
     public static Env addEnvironment(String name) {
         if (StringUtils.isBlank(name)) {
             throw new RuntimeException("Cannot add a blank environment: " + "[" + name + "]");
         }
 
+        // trim和大写
         name = getWellFormName(name);
+
         if (STRING_ENV_MAP.containsKey(name)) {
-            // has been existed
+            // 已存在忽略
             logger.debug("{} already exists.", name);
         } else {
-            // not existed
+            // 未存在添加
             STRING_ENV_MAP.put(name, new Env(name));
         }
         return STRING_ENV_MAP.get(name);

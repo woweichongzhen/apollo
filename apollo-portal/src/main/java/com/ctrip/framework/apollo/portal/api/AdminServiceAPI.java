@@ -22,9 +22,18 @@ import java.util.*;
 @Service
 public class AdminServiceAPI {
 
+    /**
+     * 健康检查api
+     */
     @Service
     public static class HealthAPI extends API {
 
+        /**
+         * 执行健康检查
+         *
+         * @param env 环境
+         * @return 健康结果
+         */
         public Health health(Env env) {
             return restTemplate.get(env, "/health", Health.class);
         }

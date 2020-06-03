@@ -25,6 +25,9 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
      */
     private final List<RepositoryChangeListener> mListeners = Lists.newCopyOnWriteArrayList();
 
+    /**
+     * 属性生产仓库
+     */
     protected PropertiesFactory propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
 
     /**

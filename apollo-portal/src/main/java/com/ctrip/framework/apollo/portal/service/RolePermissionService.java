@@ -36,14 +36,21 @@ public interface RolePermissionService {
                                   String operatorUserId);
 
     /**
-     * Remove role from users
+     * 移除拥有某个角色的用户中间表
+     *
+     * @param roleName       角色名
+     * @param userIds        要移除的用户id的角色
+     * @param operatorUserId 操作用户
      */
-    public void removeRoleFromUsers(String roleName, Set<String> userIds, String operatorUserId);
+    void removeRoleFromUsers(String roleName, Set<String> userIds, String operatorUserId);
 
     /**
-     * Query users with role
+     * 查找拥有该角色的用户
+     *
+     * @param roleName 角色名
+     * @return 用户信息
      */
-    public Set<UserInfo> queryUsersWithRole(String roleName);
+    Set<UserInfo> queryUsersWithRole(String roleName);
 
     /**
      * 按角色名称查找角色，请注意roleName应该是唯一的
@@ -54,7 +61,8 @@ public interface RolePermissionService {
     Role findRoleByRoleName(String roleName);
 
     /**
-     * 检测用户是否有某种权限
+     * 检测用户是否有某种权限，ACL模式的判断过程
+     * 如果是 RBAC 的方式，获得 Permission 后，将再获得 Permission 对应的 RolePermission 数组，最后和 User 对应的 UserRole 数组，求 roleId 是否相交。
      *
      * @param userId         用户id
      * @param permissionType 权限类型
@@ -64,9 +72,12 @@ public interface RolePermissionService {
     boolean userHasPermission(String userId, String permissionType, String targetId);
 
     /**
-     * Find the user's roles
+     * 获取用户的角色
+     *
+     * @param userId 用户id
+     * @return 用户拥有的角色
      */
-    public List<Role> findUserRoles(String userId);
+    List<Role> findUserRoles(String userId);
 
     /**
      * 判断用户是否为超级用户
@@ -85,7 +96,7 @@ public interface RolePermissionService {
     Permission createPermission(Permission permission);
 
     /**
-     * 创建权限，注意permissionType+targetId应该是唯一的
+     * 批量创建权限，注意permissionType+targetId应该是唯一的
      *
      * @param permissions 要创建的权限
      * @return 创建完成的权限
@@ -93,12 +104,19 @@ public interface RolePermissionService {
     Set<Permission> createPermissions(Set<Permission> permissions);
 
     /**
-     * delete permissions when delete app.
+     * 删除应用时，删除对应的权限
+     *
+     * @param appId    应用编号
+     * @param operator 操作者
      */
-    public void deleteRolePermissionsByAppId(String appId, String operator);
+    void deleteRolePermissionsByAppId(String appId, String operator);
 
     /**
-     * delete permissions when delete app namespace.
+     * 当删除应用命名空间时删除角色权限
+     *
+     * @param appId         应用编号
+     * @param namespaceName 命名空间mc
+     * @param operator      操作者
      */
-    public void deleteRolePermissionsByAppIdAndNamespace(String appId, String namespaceName, String operator);
+    void deleteRolePermissionsByAppIdAndNamespace(String appId, String namespaceName, String operator);
 }

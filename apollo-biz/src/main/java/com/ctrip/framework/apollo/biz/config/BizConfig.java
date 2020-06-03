@@ -45,10 +45,10 @@ public class BizConfig extends RefreshableConfig {
     private static final int DEFAULT_RELEASE_MESSAGE_NOTIFICATION_BATCH_INTERVAL_IN_MILLI = 100;//100ms
     private static final int DEFAULT_LONG_POLLING_TIMEOUT = 60; //60s
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     /**
-     * 命名空间值长度重写类型
+     * 命名空间值长度重写
      */
     private static final Type NAMESPACE_VALUE_LENGTH_OVERRIDE_TYPE_REFERENCE =
             new TypeToken<Map<Long, Integer>>() {
@@ -65,6 +65,11 @@ public class BizConfig extends RefreshableConfig {
         return Collections.singletonList(propertySource);
     }
 
+    /**
+     * 获取eureka服务地址
+     *
+     * @return eureka服务地址
+     */
     public List<String> eurekaServiceUrls() {
         String configuration = getValue("eureka.service.url", "");
         if (Strings.isNullOrEmpty(configuration)) {

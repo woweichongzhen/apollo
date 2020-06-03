@@ -3,7 +3,7 @@ package com.ctrip.framework.apollo.portal.service;
 import com.ctrip.framework.apollo.common.entity.App;
 
 /**
- * 角色初始化服务
+ * 角色初始化接口
  */
 public interface RoleInitializationService {
 
@@ -42,8 +42,17 @@ public interface RoleInitializationService {
      */
     void initNamespaceSpecificEnvRoles(String appId, String namespaceName, String env, String operator);
 
+    /**
+     * 初始化创建应用角色
+     */
     void initCreateAppRole();
 
+    /**
+     * 初始化管理应用的master角色
+     *
+     * @param appId    应用编号
+     * @param operator 操作者
+     */
     void initManageAppMasterRole(String appId, String operator);
 
 }

@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.openapi.entity;
 
 import com.ctrip.framework.apollo.common.entity.BaseEntity;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -10,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
+ * 第三方应用角色
+ *
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity
@@ -17,30 +18,37 @@ import javax.persistence.Table;
 @SQLDelete(sql = "Update ConsumerRole set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class ConsumerRole extends BaseEntity {
-  @Column(name = "ConsumerId", nullable = false)
-  private long consumerId;
 
-  @Column(name = "RoleId", nullable = false)
-  private long roleId;
+    /**
+     * 第三方应用id
+     */
+    @Column(name = "ConsumerId", nullable = false)
+    private long consumerId;
 
-  public long getConsumerId() {
-    return consumerId;
-  }
+    /**
+     * 角色id
+     */
+    @Column(name = "RoleId", nullable = false)
+    private long roleId;
 
-  public void setConsumerId(long consumerId) {
-    this.consumerId = consumerId;
-  }
+    public long getConsumerId() {
+        return consumerId;
+    }
 
-  public long getRoleId() {
-    return roleId;
-  }
+    public void setConsumerId(long consumerId) {
+        this.consumerId = consumerId;
+    }
 
-  public void setRoleId(long roleId) {
-    this.roleId = roleId;
-  }
+    public long getRoleId() {
+        return roleId;
+    }
 
-  @Override
-  public String toString() {
-    return toStringHelper().add("consumerId", consumerId).add("roleId", roleId).toString();
-  }
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().add("consumerId", consumerId).add("roleId", roleId).toString();
+    }
 }
